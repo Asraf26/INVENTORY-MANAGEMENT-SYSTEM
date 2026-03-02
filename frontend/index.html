@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management System</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container-fluid">
+        <!-- Navigation Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-cube"></i> IMS</h2>
+                <p>Inventory System</p>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#dashboard" class="nav-link active" data-section="dashboard"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+                <li><a href="#inventory" class="nav-link" data-section="inventory"><i class="fas fa-boxes"></i> Inventory</a></li>
+                <li><a href="#products" class="nav-link" data-section="products"><i class="fas fa-barcode"></i> Products</a></li>
+                <li><a href="#suppliers" class="nav-link" data-section="suppliers"><i class="fas fa-truck"></i> Suppliers</a></li>
+                <li><a href="#warehouses" class="nav-link" data-section="warehouses"><i class="fas fa-warehouse"></i> Warehouses</a></li>
+                <li><a href="#purchase-orders" class="nav-link" data-section="purchase-orders"><i class="fas fa-receipt"></i> Purchase Orders</a></li>
+                <li><a href="#sales-orders" class="nav-link" data-section="sales-orders"><i class="fas fa-shopping-cart"></i> Sales Orders</a></li>
+                <li><a href="#reports" class="nav-link" data-section="reports"><i class="fas fa-chart-bar"></i> Reports</a></li>
+                <li><a href="#forecasts" class="nav-link" data-section="forecasts"><i class="fas fa-crystal-ball"></i> Forecasts</a></li>
+                <li class="logout"><a href="#logout" class="nav-link" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="header-left">
+                    <button class="menu-toggle"><i class="fas fa-bars"></i></button>
+                    <h1>Inventory Management System</h1>
+                </div>
+                <div class="header-right">
+                    <div class="search-box">
+                        <input type="text" id="globalSearch" placeholder="Search...">
+                        <button id="searchBtn"><i class="fas fa-search"></i></button>
+                    </div>
+                    <div class="user-profile">
+                        <img src="https://via.placeholder.com/40" alt="User">
+                        <span id="userName">User</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Notifications -->
+            <div id="notification" class="notification"></div>
+
+            <!-- Dashboard Section -->
+            <section id="dashboard-section" class="content-section active">
+                <div class="section-header">
+                    <h2>Dashboard</h2>
+                    <div class="header-actions">
+                        <button class="btn-secondary" id="refreshDashboard"><i class="fas fa-sync"></i> Refresh</button>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="card stats-card">
+                        <i class="fas fa-box"></i>
+                        <div class="stats-content">
+                            <h3>Total Products</h3>
+                            <p id="totalProducts">0</p>
+                        </div>
+                    </div>
+
+                    <div class="card stats-card">
+                        <i class="fas fa-warehouse"></i>
+                        <div class="stats-content">
+                            <h3>Warehouses</h3>
+                            <p id="totalWarehouses">0</p>
+                        </div>
+                    </div>
+
+                    <div class="card stats-card">
+                        <i class="fas fa-truck"></i>
+                        <div class="stats-content">
+                            <h3>Purchase Orders</h3>
+                            <p id="totalPOs">0</p>
+                        </div>
+                    </div>
+
+                    <div class="card stats-card">
+                        <i class="fas fa-shopping-cart"></i>
+                        <div class="stats-content">
+                            <h3>Sales Orders</h3>
+                            <p id="totalSOs">0</p>
+                        </div>
+                    </div>
+
+                    <div class="card stats-card alert">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div class="stats-content">
+                            <h3>Low Stock Items</h3>
+                            <p id="lowStockCount">0</p>
+                        </div>
+                    </div>
+
+                    <div class="card stats-card">
+                        <i class="fas fa-users"></i>
+                        <div class="stats-content">
+                            <h3>Suppliers</h3>
+                            <p id="totalSuppliers">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="charts-grid">
+                    <div class="card">
+                        <h3>Sales Trends (30 Days)</h3>
+                        <canvas id="salesTrendChart"></canvas>
+                    </div>
+                    <div class="card">
+                        <h3>Top Products</h3>
+                        <canvas id="topProductsChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Inventory Section -->
+            <section id="inventory-section" class="content-section">
+                <div class="section-header">
+                    <h2>Inventory Management</h2>
+                    <div class="header-actions">
+                        <button class="btn-primary" id="addInventoryBtn"><i class="fas fa-plus"></i> Add Item</button>
+                        <button class="btn-secondary" id="exportInventoryBtn"><i class="fas fa-download"></i> Export</button>
+                    </div>
+                </div>
+
+                <div class="filter-bar">
+                    <input type="text" id="inventorySearch" placeholder="Search inventory...">
+                    <select id="warehouseFilter">
+                        <option value="">All Warehouses</option>
+                    </select>
+                    <select id="statusFilter">
+                        <option value="">All Status</option>
+                        <option value="in-stock">In Stock</option>
+                        <option value="low-stock">Low Stock</option>
+                        <option value="out-of-stock">Out of Stock</option>
+                    </select>
+                </div>
+
+                <div class="table-container">
+                    <table id="inventoryTable" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Warehouse</th>
+                                <th>Location</th>
+                                <th>Quantity</th>
+                                <th>Batch</th>
+                                <th>Expiry Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Products Section -->
+            <section id="products-section" class="content-section">
+                <div class="section-header">
+                    <h2>Products</h2>
+                    <div class="header-actions">
+                        <button class="btn-primary" id="addProductBtn"><i class="fas fa-plus"></i> Add Product</button>
+                        <button class="btn-secondary" id="exportProductsBtn"><i class="fas fa-download"></i> Export</button>
+                        <button class="btn-secondary" id="barcodeSearchBtn"><i class="fas fa-barcode"></i> Scan Barcode</button>
+                    </div>
+                </div>
+
+                <div class="filter-bar">
+                    <input type="text" id="productSearch" placeholder="Search products...">
+                    <select id="categoryFilter">
+                        <option value="">All Categories</option>
+                        <option value="electronics">Electronics</option>
+                        <option value="textiles">Textiles</option>
+                        <option value="furniture">Furniture</option>
+                        <option value="food">Food & Beverage</option>
+                        <option value="other">Other</option>
+                    </select>
+                    <select id="statusFilter">
+                        <option value="">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                        <option value="discontinued">Discontinued</option>
+                    </select>
+                </div>
+
+                <div class="table-container">
+                    <table id="productsTable" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Barcode</th>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Supplier</th>
+                                <th>Unit Price</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productsTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Suppliers Section -->
+            <section id="suppliers-section" class="content-section">
+                <div class="section-header">
+                    <h2>Suppliers</h2>
+                    <div class="header-actions">
+                        <button class="btn-primary" id="addSupplierBtn"><i class="fas fa-plus"></i> Add Supplier</button>
+                        <button class="btn-secondary" id="exportSuppliersBtn"><i class="fas fa-download"></i> Export</button>
+                    </div>
+                </div>
+
+                <div class="filter-bar">
+                    <input type="text" id="supplierSearch" placeholder="Search suppliers...">
+                    <input type="text" id="cityFilter" placeholder="Filter by city...">
+                </div>
+
+                <div class="table-container">
+                    <table id="suppliersTable" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>City</th>
+                                <th>Country</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="suppliersTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Warehouses Section -->
+            <section id="warehouses-section" class="content-section">
+                <div class="section-header">
+                    <h2>Warehouses</h2>
+                    <div class="header-actions">
+                        <button class="btn-primary" id="addWarehouseBtn"><i class="fas fa-plus"></i> Add Warehouse</button>
+                        <button class="btn-secondary" id="exportWarehousesBtn"><i class="fas fa-download"></i> Export</button>
+                    </div>
+                </div>
+
+                <div class="filter-bar">
+                    <input type="text" id="warehouseSearch" placeholder="Search warehouses...">
+                    <input type="text" id="warehouseCityFilter" placeholder="Filter by city...">
+                </div>
+
+                <div class="table-container">
+                    <table id="warehousesTable" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Address</th>
+                                <th>City</th>
+                                <th>Manager</th>
+                                <th>Capacity</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="warehousesTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Purchase Orders Section -->
+            <section id="purchase-orders-section" class="content-section">
+                <div class="section-header">
+                    <h2>Purchase Orders</h2>
+                    <div class="header-actions">
+                        <button class="btn-primary" id="createPOBtn"><i class="fas fa-plus"></i> Create PO</button>
+                        <button class="btn-secondary" id="exportPOsBtn"><i class="fas fa-download"></i> Export</button>
+                    </div>
+                </div>
+
+                <div class="filter-bar">
+                    <input type="text" id="poSearch" placeholder="Search POs...">
+                    <select id="poStatusFilter">
+                        <option value="">All Status</option>
+                        <option value="draft">Draft</option>
+                        <option value="submitted">Submitted</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="received">Received</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+
+                <div class="table-container">
+                    <table id="posTable" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>PO Number</th>
+                                <th>Supplier</th>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Total Cost</th>
+                                <th>Status</th>
+                                <th>Expected Delivery</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="posTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Sales Orders Section -->
+            <section id="sales-orders-section" class="content-section">
+                <div class="section-header">
+                    <h2>Sales Orders</h2>
+                    <div class="header-actions">
+                        <button class="btn-primary" id="createSOBtn"><i class="fas fa-plus"></i> Create SO</button>
+                        <button class="btn-secondary" id="exportSOsBtn"><i class="fas fa-download"></i> Export</button>
+                    </div>
+                </div>
+
+                <div class="filter-bar">
+                    <input type="text" id="soSearch" placeholder="Search SOs...">
+                    <select id="soStatusFilter">
+                        <option value="">All Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="packed">Packed</option>
+                        <option value="shipped">Shipped</option>
+                        <option value="delivered">Delivered</option>
+                    </select>
+                </div>
+
+                <div class="table-container">
+                    <table id="sosTable" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>SO Number</th>
+                                <th>Product</th>
+                                <th>Customer</th>
+                                <th>Quantity</th>
+                                <th>Total Price</th>
+                                <th>Status</th>
+                                <th>Ship Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sosTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Reports Section -->
+            <section id="reports-section" class="content-section">
+                <div class="section-header">
+                    <h2>Reports & Analytics</h2>
+                    <div class="header-actions">
+                        <button class="btn-secondary" id="generateReportBtn"><i class="fas fa-file"></i> Generate Report</button>
+                    </div>
+                </div>
+
+                <div class="reports-grid">
+                    <div class="card">
+                        <h3>Sales Trends</h3>
+                        <button class="btn-secondary" id="viewSalesTrends">View Trends</button>
+                    </div>
+                    <div class="card">
+                        <h3>Top Selling Products</h3>
+                        <button class="btn-secondary" id="viewTopProducts">View Top Products</button>
+                    </div>
+                    <div class="card">
+                        <h3>Low Stock Alert</h3>
+                        <button class="btn-secondary" id="viewLowStock">View Low Stock</button>
+                    </div>
+                    <div class="card">
+                        <h3>Inventory Summary</h3>
+                        <button class="btn-secondary" id="viewInventorySummary">View Summary</button>
+                    </div>
+                </div>
+
+                <div id="reportContainer" class="card" style="display: none;">
+                    <h3 id="reportTitle">Report</h3>
+                    <canvas id="reportChart"></canvas>
+                    <div id="reportData"></div>
+                </div>
+            </section>
+
+            <!-- Forecasts Section -->
+            <section id="forecasts-section" class="content-section">
+                <div class="section-header">
+                    <h2>Demand Forecasts</h2>
+                    <div class="header-actions">
+                        <button class="btn-primary" id="generateForecastBtn"><i class="fas fa-crystal-ball"></i> Generate Forecast</button>
+                        <button class="btn-secondary" id="exportForecastsBtn"><i class="fas fa-download"></i> Export</button>
+                    </div>
+                </div>
+
+                <div class="filter-bar">
+                    <select id="forecastProductFilter">
+                        <option value="">Select Product</option>
+                    </select>
+                    <input type="number" id="forecastDays" value="30" min="1" max="365" placeholder="Days ahead">
+                </div>
+
+                <div class="table-container">
+                    <table id="forecastsTable" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Forecast Date</th>
+                                <th>Predicted Demand</th>
+                                <th>Confidence Score</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="forecastsTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Add/Edit Product Modal -->
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="productModalTitle">Add Product</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <form id="productForm" class="modal-form">
+                <div class="form-group">
+                    <label>Product Name *</label>
+                    <input type="text" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label>Barcode *</label>
+                    <input type="text" name="barcode" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea name="description"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Category *</label>
+                        <select name="category" required>
+                            <option>electronics</option>
+                            <option>textiles</option>
+                            <option>furniture</option>
+                            <option>food</option>
+                            <option>other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Supplier *</label>
+                        <select name="supplier" required id="productSupplier">
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Unit Cost *</label>
+                        <input type="number" name="unit_cost" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Unit Price *</label>
+                        <input type="number" name="unit_price" step="0.01" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Reorder Level *</label>
+                        <input type="number" name="reorder_level" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select name="status">
+                            <option>active</option>
+                            <option>inactive</option>
+                            <option>discontinued</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="cancelProductBtn">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Product</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add/Edit Supplier Modal -->
+    <div id="supplierModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="supplierModalTitle">Add Supplier</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <form id="supplierForm" class="modal-form">
+                <div class="form-group">
+                    <label>Supplier Name *</label>
+                    <input type="text" name="name" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Email *</label>
+                        <input type="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone *</label>
+                        <input type="tel" name="phone" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Address *</label>
+                    <textarea name="address" required></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>City *</label>
+                        <input type="text" name="city" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Country *</label>
+                        <input type="text" name="country" required>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="cancelSupplierBtn">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Supplier</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add/Edit Warehouse Modal -->
+    <div id="warehouseModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="warehouseModalTitle">Add Warehouse</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <form id="warehouseForm" class="modal-form">
+                <div class="form-group">
+                    <label>Warehouse Name *</label>
+                    <input type="text" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label>Address *</label>
+                    <textarea name="address" required></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>City *</label>
+                        <input type="text" name="city" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Country *</label>
+                        <input type="text" name="country" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Manager Name *</label>
+                        <input type="text" name="manager_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Manager Phone *</label>
+                        <input type="tel" name="manager_phone" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Capacity *</label>
+                    <input type="number" name="capacity" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="cancelWarehouseBtn">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Warehouse</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Create Purchase Order Modal -->
+    <div id="poModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Create Purchase Order</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <form id="poForm" class="modal-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Supplier *</label>
+                        <select name="supplier_id" required id="poSupplier">
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Product *</label>
+                        <select name="product_id" required id="poProduct">
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Quantity *</label>
+                        <input type="number" name="quantity" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Expected Delivery *</label>
+                        <input type="date" name="expected_delivery" required>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="cancelPOBtn">Cancel</button>
+                    <button type="submit" class="btn-primary">Create PO</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Create Sales Order Modal -->
+    <div id="soModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Create Sales Order</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <form id="soForm" class="modal-form">
+                <div class="form-group">
+                    <label>Product *</label>
+                    <select name="product_id" required id="soProduct">
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Quantity *</label>
+                    <input type="number" name="quantity" required>
+                </div>
+                <div class="form-group">
+                    <label>Customer Name *</label>
+                    <input type="text" name="customer_name" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Customer Email *</label>
+                        <input type="email" name="customer_email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Customer Phone *</label>
+                        <input type="tel" name="customer_phone" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Ship Date *</label>
+                    <input type="date" name="ship_date" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="cancelSOBtn">Cancel</button>
+                    <button type="submit" class="btn-primary">Create SO</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Barcode Scan Modal -->
+    <div id="barcodeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Barcode Lookup</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <form id="barcodeForm" class="modal-form">
+                <div class="form-group">
+                    <label>Scan or Enter Barcode *</label>
+                    <input type="text" id="barcodeInput" placeholder="Click to focus and scan..." required autofocus>
+                </div>
+                <div id="barcodeResult" style="display: none;" class="product-result">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="closeBarcodeBtn">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="assets/js/config.js"></script>
+    <script src="assets/js/error-handler.js"></script>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/ui.js"></script>
+    <script src="assets/js/app.js"></script>
+</body>
+</html>
